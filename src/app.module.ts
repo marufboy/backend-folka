@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { BooksModule } from './books/books.module';
+import { PaymentsModule } from './payments/payments.module';
+import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [ConfigModule.forRoot({
+    isGlobal: true
+  }), BooksModule, PaymentsModule, PrismaModule],
 })
 export class AppModule {}
