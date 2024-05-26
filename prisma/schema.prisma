@@ -18,7 +18,10 @@ model User {
   id       Int       @id @default(autoincrement())
   email    String    @unique
   name     String?
+  hash     String?
   payments Payment[]
+
+  @@map("users")
 }
 
 model Book {
@@ -28,6 +31,8 @@ model Book {
   price        Float
   downloadLink String
   payments     Payment[]
+
+  @@map("books")
 }
 
 model Payment {
@@ -39,4 +44,6 @@ model Payment {
 
   user User @relation(fields: [userId], references: [id])
   book Book @relation(fields: [bookId], references: [id])
+
+  @@map("payments")
 }
