@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import * as argon from 'argon2'
 import { AuthDto } from './dto'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
-import { ForbiddenExceptionMessage } from '../common/exception.enum'
+import { ExceptionMessage } from '../common/exception.enum'
 
 @Injectable()
 export class AuthService {
@@ -32,7 +32,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException(ForbiddenExceptionMessage.CredentialsTaken)
+          throw new ForbiddenException(ExceptionMessage.CredentialsTaken)
         }
       }
 
@@ -50,12 +50,12 @@ export class AuthService {
 
     // if user does note exist throw exception
     if (!user)
-      throw new ForbiddenException(ForbiddenExceptionMessage.CredentialsIncorrect)
+      throw new ForbiddenException(ExceptionMessage.CredentialsIncorrect)
     //compare password
     const pwMatches = await argon.verify(user.hash, dto.password)
     //if password incorecct throw exception
     if (!pwMatches)
-      throw new ForbiddenException(ForbiddenExceptionMessage.CredentialsIncorrect)
+      throw new ForbiddenException(ExceptionMessage.CredentialsIncorrect)
 
     return this.signToken(user.id, user.email)
   }

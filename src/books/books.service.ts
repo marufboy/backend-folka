@@ -1,8 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
-import { CreateBookDto } from './dto/create-book.dto'
-import { UpdateBookDto } from './dto/update-book.dto'
-import { ForbiddenExceptionMessage } from '../common/exception.enum'
+import { ExceptionMessage } from '../common/exception.enum'
+import { CreateBookDto, UpdateBookDto } from './dto'
 
 @Injectable()
 export class BooksService {
@@ -28,7 +27,7 @@ export class BooksService {
     })
 
     if (!book) {
-      throw new ForbiddenException(ForbiddenExceptionMessage.BookNotFound)
+      throw new ForbiddenException(ExceptionMessage.BookNotFound)
     }
 
     return this.prisma.book.update({
@@ -50,7 +49,7 @@ export class BooksService {
     })
 
     if (!book) {
-      throw new ForbiddenException(ForbiddenExceptionMessage.BookNotFound)
+      throw new ForbiddenException(ExceptionMessage.BookNotFound)
     }
 
     await this.prisma.book.delete({
@@ -60,7 +59,7 @@ export class BooksService {
   })
   }
 
-  //TODO Get detail book
+  //Get detail book
   getBookById(bookId: number) {
     return this.prisma.book.findFirst({
       where: {

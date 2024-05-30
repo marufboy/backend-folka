@@ -12,22 +12,31 @@ export class CreateBookDto {
   title: string
 
   @ApiProperty({
-    description: 'Author of the story book',
-    example: 'Mas pengen ganteng',
+    description: 'Origin story place of the story book',
+    example: 'Tempat terganteng',
     required: true,
   })
   @IsString()
   @IsNotEmpty()
-  author: string
+  originStory: string
 
   @ApiProperty({
-    description: 'Price of the story book',
-    example: 50000,
+    description: 'Synopsis of the story book',
+    example: 'Mas pengen ganteng sedang ingin pergi ke tempat terganteng',
     required: true,
   })
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  price: number
+  synopsis: string
+
+  @ApiProperty({
+    description: 'Cover image of the story book',
+    example: 'http://google.com',
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  imageUrl: string
 
   @ApiProperty({
     description: 'Download link of the story book',

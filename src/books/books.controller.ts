@@ -12,11 +12,15 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import { BooksService } from './books.service'
-import { CreateBookDto } from './dto/create-book.dto'
-import { UpdateBookDto } from './dto/update-book.dto'
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 import { BookEntity } from './entity/book.entity'
 import { JwtGuard } from '../auth/guard'
+import { CreateBookDto, UpdateBookDto } from './dto'
 
 @UseGuards(JwtGuard)
 @ApiTags('Books')
@@ -66,8 +70,7 @@ export class BooksController {
 
   @Get()
   @ApiOkResponse({
-    description:
-      'Get books object as response',
+    description: 'Get books object as response',
     type: BookEntity,
     isArray: true,
   })
@@ -75,11 +78,9 @@ export class BooksController {
     return this.booksService.getAllBooks()
   }
 
-
   @Get('bought/:userId')
   @ApiOkResponse({
-    description:
-      'Get books bought by user object as response',
+    description: 'Get books bought by user object as response',
     type: BookEntity,
     isArray: true,
   })
@@ -87,11 +88,9 @@ export class BooksController {
     return this.booksService.getBoughtBooks(userId)
   }
 
-  
   @Get('unbought/:userId')
   @ApiOkResponse({
-    description:
-      'Get books unbought by user object as response',
+    description: 'Get books unbought by user object as response',
     type: BookEntity,
     isArray: true,
   })

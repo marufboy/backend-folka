@@ -27,8 +27,9 @@ model User {
 model Book {
   id           Int       @id @default(autoincrement())
   title        String
-  author       String
-  price        Float
+  originStory  String
+  synopsis     String
+  imageUrl     String
   downloadLink String
   payments     Payment[]
 

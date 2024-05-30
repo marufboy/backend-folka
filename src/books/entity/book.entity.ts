@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Book } from '@prisma/client'
 
 export class BookEntity implements Book {
+  originStory: string
+  synopsis: string
+  imageUrl: string
   @ApiProperty({ example: 1 })
   id: number
 
