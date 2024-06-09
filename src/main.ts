@@ -22,8 +22,7 @@ async function bootstrap() {
     .setDescription('API for managing folka app')
     .setVersion('1.0')
     .addServer('http://localhost:3000/', 'Local environment')
-    .addServer('https://backend-folka.vercel.app/', 'Staging')
-    // .addServer('https://production.yourapi.com/', 'Production')
+    .addServer('https://backend-folka.vercel.app/', 'Production')
     .addBearerAuth()
     .build()
 
