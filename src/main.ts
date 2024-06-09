@@ -21,13 +21,12 @@ async function bootstrap() {
     .setTitle('Folka REST API')
     .setDescription('API for managing folka app')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/', 'Local environment')
-    .addServer('https://backend-folka.vercel.app/', 'Production')
+    .addServer(configService.get('SERVER_URL'), configService.get('VERCEL_ENV'))
     .addBearerAuth()
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('api/docs', app, document, {
+  SwaggerModule.setup('api-docs', app, document, {
     customfavIcon: 'https://avatars.githubusercontent.com/u/6936373?s=200&v=4',
     customJs: [
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.min.js',
