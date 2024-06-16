@@ -1,10 +1,11 @@
-import { Controller, Get, UseGuards } from '@nestjs/common'
+import { Controller, Get, HttpStatus, UseGuards } from '@nestjs/common'
 import { UserService } from './user.service'
 import { ApiTags, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger'
 import { JwtGuard } from '../auth/guard'
 import { GetUser } from '../auth/decorator'
 import { User } from '@prisma/client'
 import { UserEntity } from './entity/user.entity'
+import { ResponseUtil } from '../common/utils/response.util'
 
 @UseGuards(JwtGuard)
 @ApiTags('Users')
@@ -19,6 +20,6 @@ export class UserController {
     type: UserEntity,
   })
   getUser(@GetUser() user: User) {
-    return user
+    return ResponseUtil.success(user, "User information retrieved successfully", HttpStatus.OK)
   }
 }

@@ -1,7 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { ExceptionMessage } from '../common/exception.enum'
 import { CreateBookDto, UpdateBookDto } from './dto'
+import { ResponseUtil } from '../common/utils/response.util'
 
 @Injectable()
 export class BooksService {
@@ -15,7 +16,7 @@ export class BooksService {
       },
     })
 
-    return book
+    return ResponseUtil.success(book, 'Book created successfully', HttpStatus.CREATED)
   }
   //TODO Update Book
   async updateBook(bookId: number, dto: UpdateBookDto) {
@@ -30,7 +31,7 @@ export class BooksService {
       throw new ForbiddenException(ExceptionMessage.BookNotFound)
     }
 
-    return this.prisma.book.update({
+    const updatedBook = await this.prisma.book.update({
       where: {
         id: bookId,
       },
@@ -38,6 +39,8 @@ export class BooksService {
         ...dto,
       },
     })
+
+    return ResponseUtil.success(updatedBook, 'Book updated successfully', HttpStatus.OK)
   }
   //TODO Delete book
   async deleteBookById(bookId: number) {
@@ -54,48 +57,62 @@ export class BooksService {
 
     await this.prisma.book.delete({
       where: {
-          id: bookId,
-      }
-  })
+        id: bookId,
+      },
+    })
+
+    return ResponseUtil.success(null, 'Book deleted successfully', HttpStatus.OK)
   }
 
   //Get detail book
-  getBookById(bookId: number) {
-    return this.prisma.book.findFirst({
+  async getBookById(bookId: number) {
+    const book = await this.prisma.book.findFirst({
       where: {
-        id: bookId
-      }
+        id: bookId,
+      },
     })
+
+    return ResponseUtil.success(book, 'Book retrieved successfully', HttpStatus.OK)
   }
 
   async getAllBooks() {
-    return this.prisma.book.findMany()
+    const books = await this.prisma.book.findMany()
+    return ResponseUtil.success(books, 'Books retrieved successfully', HttpStatus.OK)
   }
 
   async getBoughtBooks(userId: number) {
-    const payments = await this.prisma.payment.findMany({
-      where: { userId },
-      include: { book: true },
-    })
-    return payments.map((payment) => payment.book)
-  }
-
-  async getUnboughtBooks(userId: number) {
-    // Fetch IDs of books the user has already bought
-    const boughtBooks = await this.prisma.payment.findMany({
-      where: { userId },
-      select: { bookId: true },
-    })
-
-    const boughtBookIds = boughtBooks.map((payment) => payment.bookId)
-
-    // Fetch books that are not in the list of bought book IDs
-    return this.prisma.book.findMany({
+    const books = await this.prisma.book.findMany({
       where: {
-        id: {
-          notIn: boughtBookIds,
+        payments: {
+          some: {
+            userId: userId,
+          },
         },
       },
     })
+
+    return ResponseUtil.success(
+      books,
+      'Bought books retrieved successfully',
+      HttpStatus.OK,
+    )
+  }
+
+  async getUnboughtBooks(userId: number) {
+    const unboughtBooks = await this.prisma.book.findMany({
+      where: {
+        payments: {
+          none: {
+            userId: userId,
+          },
+        },
+      },
+    })
+
+    return ResponseUtil.success(
+      unboughtBooks,
+      'Unbought books retrieved successfully',
+      HttpStatus.OK,
+    )
   }
 }
