@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import * as argon from 'argon2'
-import { AuthDto } from './dto'
+import { AuthDto, RefreshTokenDto } from './dto'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { ExceptionMessage } from '../common/exception.enum'
 import { ResponseUtil } from '../common/utils/response.util'
@@ -63,21 +63,39 @@ export class AuthService {
     return ResponseUtil.success(token, "Signin succesful", HttpStatus.OK)
   }
 
-  async signToken(userId: number, email: string): Promise<{ access_token: string }> {
+  async signToken(userId: number, email: string): Promise<{ access_token: string, refresh_token: string }> {
     const payload = {
       sub: userId,
       email,
     }
 
-    const secret = this.config.get('JWT_SECRET')
-
-    const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
-      secret: secret,
-    })
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwt.signAsync(payload, {
+        expiresIn: '1d',
+        secret: this.config.get('JWT_SECRET'),
+      }),
+      this.jwt.signAsync(payload, {
+        expiresIn: '7d',
+        secret: this.config.get('JWT_REFRESH_SECRET'),
+      }),
+    ])
 
     return {
-      access_token: token,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    }
+  }
+
+  async refreshTokens(dto: RefreshTokenDto) {
+    try {
+      const payload = await this.jwt.verifyAsync(dto.refreshToken, {
+        secret: this.config.get('JWT_REFRESH_SECRET'),
+      })
+
+      const tokens = await this.signToken(payload.sub, payload.email)
+      return ResponseUtil.success(tokens, "Tokens refreshed successfully", HttpStatus.OK)
+    } catch (error) {
+      throw new ForbiddenException(ExceptionMessage.CredentialsIncorrect)
     }
   }
 }
