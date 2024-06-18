@@ -1,16 +1,22 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreatePaymentDto } from './dto'
 import { ExceptionMessage } from '../common/exception.enum'
+import { ResponseUtil } from '../common/utils/response.util'
 
 @Injectable()
 export class PaymentsService {
   constructor(private prisma: PrismaService) {}
 
   async createPayment(dto: CreatePaymentDto) {
-    const book = await this.prisma.book.findUnique({ where: { id: dto.bookId } });
+    const book = await this.prisma.book.findUnique({ where: { id: dto.bookId } })
     if (!book) {
-      throw new NotFoundException(ExceptionMessage.BookNotFound);
+      throw new NotFoundException(ExceptionMessage.BookNotFound)
     }
 
     const existingPayment = await this.prisma.payment.findFirst({
@@ -18,23 +24,35 @@ export class PaymentsService {
         userId: dto.userId,
         bookId: dto.bookId,
       },
-    });
+    })
 
     if (existingPayment) {
-      throw new BadRequestException(ExceptionMessage.AlreadyBoughtBook);
+      throw new BadRequestException(ExceptionMessage.AlreadyBoughtBook)
     }
 
-    return this.prisma.payment.create({
+    const payment = await this.prisma.payment.create({
       data: {
         ...dto,
       },
-    });
+    })
+
+    return ResponseUtil.success(
+      payment,
+      'Payment created successfully',
+      HttpStatus.CREATED,
+    )
   }
 
   async getPaymentsByUserId(userId: number) {
-    return this.prisma.payment.findMany({
+    const payments = await this.prisma.payment.findMany({
       where: { userId },
     })
+
+    return ResponseUtil.success(
+      payments,
+      'Payments retrieved successfully',
+      HttpStatus.OK,
+    )
   }
 
   async getTotalAmountByBookId(bookId: number) {
@@ -44,7 +62,12 @@ export class PaymentsService {
       },
       where: { bookId },
     })
-    return result._sum.amount
+
+    return ResponseUtil.success(
+      {"totalAmount":result._sum.amount},
+      'Total amount retrieved successfully',
+      HttpStatus.OK,
+    )
   }
 
   async deletePayment(paymentId: number) {
@@ -54,8 +77,10 @@ export class PaymentsService {
       throw new NotFoundException(ExceptionMessage.PaymentNotFound)
     }
 
-    return this.prisma.payment.delete({
+    await this.prisma.payment.delete({
       where: { id: paymentId },
-    })
+    });
+
+    return ResponseUtil.success(null, 'Payment deleted successfully', HttpStatus.OK)
   }
 }

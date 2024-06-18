@@ -11,10 +11,10 @@ export class  AuthDto{
     email: string
 
     @ApiProperty({
-        description: 'Password of the user',
+        description: 'AppleID of the user (userID in apple account)',
         example: 'pengenganteng'
       })
     @IsString()
     @IsNotEmpty()
-    password: string
+    appleID: string
 }
