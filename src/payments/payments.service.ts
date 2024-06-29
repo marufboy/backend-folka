@@ -48,6 +48,10 @@ export class PaymentsService {
       where: { userId },
     })
 
+    if (payments.length === 0) {
+      throw new NotFoundException(ExceptionMessage.PaymentNotFound)
+    }
+
     return ResponseUtil.success(
       payments,
       'Payments retrieved successfully',
