@@ -21,6 +21,7 @@ import {
 import { BookEntity } from './entity/book.entity'
 import { JwtGuard } from '../auth/guard'
 import { CreateBookDto, UpdateBookDto } from './dto'
+import { Public } from '../auth/decorator'
 
 @UseGuards(JwtGuard)
 @ApiTags('Books')
@@ -59,6 +60,7 @@ export class BooksController {
     return this.booksService.deleteBookById(id)
   }
 
+  @Public()
   @Get(':id')
   @ApiOkResponse({
     description: 'Get book by id object as response',
@@ -68,6 +70,7 @@ export class BooksController {
     return this.booksService.getBookById(id)
   }
 
+  @Public()
   @Get()
   @ApiOkResponse({
     description: 'Get books object as response',
