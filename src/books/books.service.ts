@@ -72,6 +72,10 @@ export class BooksService {
       },
     })
 
+    if (!book) {
+      throw new ForbiddenException(ExceptionMessage.BookNotFound)
+    }
+
     return ResponseUtil.success(book, 'Book retrieved successfully', HttpStatus.OK)
   }
 
@@ -91,6 +95,10 @@ export class BooksService {
       },
     })
 
+    if (books.length === 0) {
+      throw new ForbiddenException(ExceptionMessage.BookBoughtNotFound)
+    }
+
     return ResponseUtil.success(
       books,
       'Bought books retrieved successfully',
@@ -108,6 +116,10 @@ export class BooksService {
         },
       },
     })
+
+    if (unboughtBooks.length === 0) {
+      throw new ForbiddenException(ExceptionMessage.BookUnBoughtNotFound)
+    }
 
     return ResponseUtil.success(
       unboughtBooks,
